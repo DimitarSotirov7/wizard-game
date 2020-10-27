@@ -38,7 +38,8 @@ function solve() {
         fireBallMultiplier: 5,
         fireInterval: 1000,
         cloudSpawnInterval: 3000,
-        bugSpawnInterval: 1000
+        bugSpawnInterval: 1000,
+        bugKillBonus: 2000
     };
 
     let scene = {
@@ -133,12 +134,16 @@ function solve() {
             }
 
             fireBalls.forEach(fireBall => {
-                
+                if (isCollision(fireBall, bug)) {
+                    scene.score += game.bugKillBonus;
+                    fireBall.parentElement.removeChild(fireBall);
+                    bug.parentElement.removeChild(bug);
+                }
             });
         });
 
         if (scene.isActiveGame) {
-            window.requestAnimationFrame(gameAction);   
+            window.requestAnimationFrame(gameAction);
         }
     }
 
@@ -150,11 +155,12 @@ function solve() {
     function isCollision(firstElement, secondElement) {
         let firstRect = firstElement.getBoundingClientRect();
         let secondRect = secondElement.getBoundingClientRect();
-        
-        return !(firstRect.top > secondRect.button ||
-            firstRect.button < secondRect.top ||
+
+        return !(firstRect.top > secondRect.botton ||
+            firstRect.botton < secondRect.top ||
             firstRect.right < secondRect.left ||
             firstRect.left > secondRect.right);
+
     }
 
     function addFireBall(player) {
