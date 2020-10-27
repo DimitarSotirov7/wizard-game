@@ -44,7 +44,8 @@ function solve() {
     let scene = {
         score: 0,
         lastCloudSpawn: 0,
-        lastBugSpawn: 0
+        lastBugSpawn: 0,
+        isActiveGame: true
     }
 
     function onKeyDown(e) {
@@ -125,7 +126,35 @@ function solve() {
                 fB.parentElement.removeChild(fB);
             }
         });
-        window.requestAnimationFrame(gameAction);
+
+        bugs.forEach(bug => {
+            if (isCollision(wizard, bug)) {
+                gameOverAction();
+            }
+
+            fireBalls.forEach(fireBall => {
+                
+            });
+        });
+
+        if (scene.isActiveGame) {
+            window.requestAnimationFrame(gameAction);   
+        }
+    }
+
+    function gameOverAction() {
+        scene.isActiveGame = false;
+        gameOver.classList.remove('hide');
+    }
+
+    function isCollision(firstElement, secondElement) {
+        let firstRect = firstElement.getBoundingClientRect();
+        let secondRect = secondElement.getBoundingClientRect();
+        
+        return !(firstRect.top > secondRect.button ||
+            firstRect.button < secondRect.top ||
+            firstRect.right < secondRect.left ||
+            firstRect.left > secondRect.right);
     }
 
     function addFireBall(player) {
