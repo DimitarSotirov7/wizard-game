@@ -27,7 +27,7 @@ function solve() {
     let keys = {};
     let player = {
         x: 150,
-        y:100,
+        y: 100,
         width: 0,
         height: 0,
         lastTimeFiredFireBall: 0
@@ -36,11 +36,13 @@ function solve() {
         speed: 2,
         movingMultiplier: 4,
         fireBallMultiplier: 5,
-        fireInterval: 1000
+        fireInterval: 1000,
+        cloudSpawnInterval: 3000
     };
 
     let scene = {
-        score: 0
+        score: 0,
+        lastCloudSpawn: 0
     }
 
     function onKeyDown(e) {
@@ -67,7 +69,7 @@ function solve() {
             player.y += game.speed * game.movingMultiplier;
         }
 
-        if (keys.Left && player.x > 0) {
+        if (keys.ArrowLeft && player.x > 0) {
             player.x -= game.speed * game.movingMultiplier;
         }
 
@@ -89,6 +91,18 @@ function solve() {
         scene.score++;
         gamePoints.textContent = scene.score;
 
+        addCloud(timestamp);
+
+        let clouds = document.querySelectorAll('.cloud');
+        clouds.forEach(cloud => {
+            cloud.x -= game.speed;
+            cloud.style.left = cloud.x + 'px';
+
+            if (cloud.x + cloud.offsetWidth <= 0) {
+                cloud.parentElement.removeChild(cloud);
+            }
+        });
+
         let fireBalls = document.querySelectorAll('.fire-ball');
         fireBalls.forEach(fB => {
             fB.x += game.speed * game.fireBallMultiplier;
@@ -106,8 +120,20 @@ function solve() {
         fireBall.classList.add('fire-ball');
         fireBall.style.top = (player.y + player.height / 3 - 5) + 'px';
         fireBall.x = player.x + player.width;
-        fireBall.style.left = fireBall.x + 'px'; 
+        fireBall.style.left = fireBall.x + 'px';
 
         gameArea.appendChild(fireBall);
+    }
+
+    function addCloud(timestamp) {
+        if (timestamp - scene.lastCloudSpawn > game.cloudSpawnInterval + 20000 * Math.random()) {
+            let cloud = document.createElement('div');
+            cloud.classList.add('.cloud');
+            cloud.x = gameArea.offsetWidth - 200;
+            cloud.style.left = cloud.x + 'px';
+            cloud.style.top = (gameArea.offsetHeight - 200) * Math.random() + 'px';
+            gameArea.appendChild(cloud);
+            scene.lastCloudSpawn = timestamp;
+        }
     }
 }
