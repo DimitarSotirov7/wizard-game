@@ -29,11 +29,14 @@ function solve() {
         x: 150,
         y:100,
         width: 0,
-        height: 0
+        height: 0,
+        lastTimeFiredFireBall: 0
     };
     let game = {
         speed: 2,
-        movingMultiplier: 4
+        movingMultiplier: 4,
+        fireBallMultiplier: 5,
+        fireInterval: 1000
     };
 
     let scene = {
@@ -48,7 +51,7 @@ function solve() {
         keys[e.code] = false;
     }
 
-    function gameAction() {
+    function gameAction(timestamp) {
         const wizard = document.querySelector('.wizard');
 
         let isInAir = (player.y + player.height) <= gameArea.offsetHeight;
@@ -72,9 +75,10 @@ function solve() {
             player.x += game.speed * game.movingMultiplier;
         }
 
-        if (keys.Space) {
+        if (keys.Space && timestamp - player.lastTimeFiredFireBall > game.fireInterval) {
             wizard.classList.add('wizard-fire');
-            addFireBall();
+            addFireBall(player);
+            player.lastTimeFiredFireBall = timestamp;
         } else {
             wizard.classList.remove('wizard-fire');
         }
@@ -87,13 +91,17 @@ function solve() {
 
         let fireBalls = document.querySelectorAll('.fire-ball');
         fireBalls.forEach(fB => {
-            fB.x += game.speed;
+            fB.x += game.speed * game.fireBallMultiplier;
             fB.style.left = fB.x + 'px';
+
+            if (fB.x + fB.offsetWidth > gameArea.offsetWidth) {
+                fB.parentElement.removeChild(fB);
+            }
         });
         window.requestAnimationFrame(gameAction);
     }
 
-    function addFireBall() {
+    function addFireBall(player) {
         let fireBall = document.createElement('div');
         fireBall.classList.add('fire-ball');
         fireBall.style.top = (player.y + player.height / 3 - 5) + 'px';
